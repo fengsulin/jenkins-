@@ -50,7 +50,7 @@ pipeline{
                     println "${branch}"
 
                     tools.PrintMes("获取代码","green")
-                    tools.CheckOut(${scm_type},${git_url},${git_credentialsId},${branchName})
+                    tools.CheckOut(git_url,git_credentialsId,branch)
                 }
             }
         }

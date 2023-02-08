@@ -185,6 +185,6 @@ def CheckOut(scm_type,url,credentialsId,branchName){
         checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, credentialsId: "${credentialsId}", depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: "${url}"]], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
 
     }else{
-        git branch: "${branchName}" ,changelog: true , credentialsId: "${credentialsId}", url: "${url}"
+        git branch: branchName ,changelog: true , credentialsId: credentialsId, url: url
     }
 }
