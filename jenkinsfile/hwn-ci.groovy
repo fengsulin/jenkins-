@@ -1,23 +1,23 @@
 @Library('hwn-jenkins-lib@master') _
+import org.devops.tools
+import org.devops.toemail
 
 //func form sharedlibrary
 def tools = new org.devops.tools()
 def toemail = new org.devops.toemail()
-def credentials_Id = "6ec74867-2832-4015-9ada-25acc2c76b78"
-def branch = "main"
-def username = "fengsulin"
 
+def git_credentialsId = "6ec74867-2832-4015-9ada-25acc2c76b78"
+def branch = "main"
+def userName = "fengsulin"
+def buildType = "mvn"
+def buildShell = "mvn -U -B -e clean install -T 1C -Dmaven.test.skip=true --settings settings.xml"
+def git_url = "http://git.rdc.i139.cn/tssd-commons-services/netmonitor/cmdb-service"
 def runOpts
 //env
-String buildType = "${env.buildType}".trim()
-String buildShell = "${env.buildShell}".trim()
-String srcUrl = "${env.srcUrl}".trim()
-String branchName = "${env.branchName}".trim()
 
 //branch
 //branchName = branch - "refs/heads/"
 currentBuild.description = "Trigger by ${userName} {branch}"
-gitlab.ChangeCommitStatus(projectId,commitSha,"running")
 
 //判断git触发自动执行还是手动
 if("${runOpts}" == "GitlabPush"){
@@ -33,35 +33,37 @@ if("${runOpts}" == "GitlabPush"){
 pipeline{
 
     agent{
-        node{
-            kubernetes{
-                label:"jnlp-agent-node"
-                cloud:"k8s"
-            }
-        }
+        label "jnlp-agent-node"
     }
     stages{
 
+        stage('初始化'){
+            steps{
+                script{
+                    tools.PrintMes("初始化","green")
+                }
+            }
+        }
         stage('CheckOut'){
             steps{
                 script{
                     println "${branch}"
 
                     tools.PrintMes("获取代码","green")
-                    tools.
+                    tools.CheckOut(${scm_type},${git_url},${git_credentialsId},${branchName})
                 }
             }
         }
-    }
-    stage("Build"){
-        steps{
-            script{
-                tools.PrintMes("执行打包","green")
-                build.Build(buildType,buildShell)
+        stage("Build"){
+            steps{
+                script{
+                    tools.PrintMes("执行打包","green")
+                    build.Build(buildType,buildShell)
+                }
             }
         }
-    }
 
+    }
 
     post{
         always{
@@ -72,7 +74,6 @@ pipeline{
         success{
             script{
                 println("success")
-                gitlab.ChangeCommitStatus(projectId,commitSha,"success")
                 toemail.Email("流水线成功了！",userEmail)
 
             }
@@ -80,14 +81,12 @@ pipeline{
         failure{
             script{
                 println("failure")
-                gitlab.ChangeCommitStatus(projectId,commitSha,"failed")
                 toemail.Email("流水线失败了！",userEmail)
             }
         }
         aborted{
             script{
                 println("aborted")
-                gitlab.ChangeCommitStatus(projectId,commitSha,"canceled")
                 toemail("流水线取消了！",userEmail)
             }
         }
