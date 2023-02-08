@@ -17,7 +17,7 @@ def runOpts
 
 //branch
 //branchName = branch - "refs/heads/"
-currentBuild.description = "Trigger by ${userName} {branch}"
+currentBuild.description = "Trigger by ${userName} ${branch}"
 
 //判断git触发自动执行还是手动
 if("${runOpts}" == "GitlabPush"){
