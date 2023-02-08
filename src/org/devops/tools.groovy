@@ -178,3 +178,13 @@ def PushFileToGit(git_credentialsId,push_url,fileName,git_push_username,git_push
         }
 
 }
+
+// 拉取代码
+def CheckOut(scm_type,url,credentialsId,branchName){
+    if (scm_type == "svn"){
+        checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, credentialsId: "${credentialsId}", depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: "${url}"]], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
+
+    }else{
+        git branch: "${branchName}" ,changelog: true , credentialsId: "$credentialsId", url: "${url}"
+    }
+}
