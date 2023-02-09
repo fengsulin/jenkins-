@@ -1,10 +1,12 @@
 @Library('hwn-jenkins-lib@master') _
 import org.devops.tools
 import org.devops.toemail
+import org.devops.kubernetes
 
 //func form sharedlibrary
 def tools = new org.devops.tools()
 def toemail = new org.devops.toemail()
+def k8s = new org.devops.kubernetes()
 
 def git_credentialsId = "6ec74867-2832-4015-9ada-25acc2c76b78"
 def branch = "main"
@@ -69,6 +71,8 @@ pipeline{
                     pom = tools.ReadPomFile(pom_path)
                     app_name = tools.GetPomArtifactId(pom)
                     app_version = tools.GetPomVersion(pom)
+                    branch = "${branch}" == "master" ? "":"${branch}" == "main" ? "" : "-${branch}"
+
                 }
             }
         }
@@ -90,10 +94,22 @@ pipeline{
                     tagName = tools.CreateImageTag(app_version,branch)
                     imageName = tools.CreateImageName(docker_hub,app_name,tagName,docker_project)
                     tools.PrintMes("镜像名称：${imageName}","green")
-                    tools.BuildImage(hub_credentialId,docker_hub_type,docker_hub,imageName)
+                    container('docker'){
+                        tools.BuildImage(hub_credentialId,docker_hub_type,docker_hub,imageName)
+                    }
                 }
             }
         }
+        stage("k8s"){
+            steps{
+                script{
+                    tools.PrintMes("k8s部署","green")
+                    respone = k8s.GetDeployment("dev-tool-kit","monitor-fronted-dist")
+                    println("${respone}")
+                }
+            }
+        }
+
 
     }
 

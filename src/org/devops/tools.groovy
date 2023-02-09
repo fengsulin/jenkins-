@@ -123,7 +123,7 @@ def CreateImageName(docker_hub,app_name,tagName,docker_project){
 def BuildImage(credentialId,docker_hub_type,docker_hub,imageName){
     docker.withRegistry("$docker_hub_type://$docker_hub", "$credentialId") {
         println("构建镜像")
-        def customImage = docker.build(imageName)
+        customImage = docker.build(imageName)
         println("推送镜像")
         customImage.push()
         println("删除镜像")
