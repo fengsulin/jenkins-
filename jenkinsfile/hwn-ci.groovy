@@ -60,7 +60,7 @@ pipeline{
                 script{
                     tools.PrintMes("执行打包","green")
                     tools.WriteFileFromId(maven_settings_id,"settings.xml")
-                    build.BuildWithContainer(buildType,buildShell)
+                    tools.BuildWithContainer(buildType,buildShell)
                 }
             }
         }
