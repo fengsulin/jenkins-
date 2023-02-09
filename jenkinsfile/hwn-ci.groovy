@@ -20,6 +20,7 @@ def app_name = ""
 def app_version = ""
 def docker_hub_type = "https"
 def docker_project = "net-monitor"
+def pom_path = ""
 def docker_dockerfile = "FROM hub.hwn.i139.cn/rdc-commons/official-openjdk:8u242-jre-sh\n" +
         "VOLUME /tmp\n" +
         "ADD target/*.jar app.jar\n" +
@@ -55,6 +56,9 @@ pipeline{
             steps{
                 script{
                     tools.PrintMes("初始化","green")
+                    pom = tools.ReadPomFile(pom_path)
+                    app_name = tools.GetPomArtifactId(pom)
+                    app_version = tools.GetPomVersion(pom)
                 }
             }
         }
