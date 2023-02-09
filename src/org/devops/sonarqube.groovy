@@ -50,7 +50,7 @@ def GetProjectStatus(projectName){
     return result
 }
 
-//获取Sonar项目扫描结果(多分支)
+//获取Sonar项目质量域结果(多分支)
 def GetProjectResult(projectName,branchName){
     apiUrl = "qualitygates/project_status?projectKey=${projectName}&branch=${branchName}"
     response = HttpReq("GET",apiUrl,'')
@@ -63,7 +63,7 @@ def GetProjectResult(projectName,branchName){
     return response
 }
 
-// 获取Sonar项目扫描状态(多分支)
+// 获取Sonar项目质量域结果(多分支)
 def GetProjectStatus(projectName,branchName){
     response = GetProjectResult(projectName,branchName)
     result = response["projectStatus"]["status"]
@@ -94,7 +94,6 @@ def CreateProject(projectName){
 }
 
 //配置项目质量规则
-
 def ConfigQualityProfiles(projectName,lang,qpname){
     apiUrl = "qualityprofiles/add_project?language=${lang}&project=${projectName}&qualityProfile=${qpname}"
     response = HttpReq("POST",apiUrl,'')
@@ -118,4 +117,11 @@ def ConfigQualityGates(projectName,gateName){
     apiUrl = "qualitygates/select?gateId=${gateId}&projectKey=${projectName}"
     response = HttpReq("POST",apiUrl,'')
     println(response)
+}
+
+// 获取项目metric(多分支)
+def GetMetrics(projectName,branch,metrics){
+    metric = metrics ? metrics : "duplicated_lines_density,sqale_debt_ratio,code_smells,coverage,bugs,vulnerabilities,ncloc"
+    apiUrl = "measures/component?componentKey=${projectName}&metricKeys=${metrics}"
+    response = HttpReq("GET",apiUrl,'')
 }
