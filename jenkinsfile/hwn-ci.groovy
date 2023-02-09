@@ -15,7 +15,7 @@ def git_url = "http://git.rdc.i139.cn/tssd-commons-services/netmonitor/cmdb-serv
 def runOpts
 def maven_settings_id = "76a57f8d-a5f1-4cc0-a235-b447bebefba9"
 def hub_credentialId = "docker-hub-rdchub-username-password"
-def docker_hub = ""
+def docker_hub = "hub.hwn.i139.cn"
 def app_name = ""
 def app_version = ""
 def docker_hub_type = "https"
@@ -27,7 +27,7 @@ def docker_dockerfile = "FROM hub.hwn.i139.cn/rdc-commons/official-openjdk:8u242
         "RUN sh -c 'touch /app.jar'\n" +
         "ENV JAVA_OPTS=\"-Xmx512M -Xms512M -Xss256k -XX:MaxRAMPercentage=80.0 -Duser.timezone=Asia/Shanghai\"\n" +
         "ENV APP_OPTS=\"\"\n" +
-        "ENTRYPOINT [ \"sh\", \"-c\", \"java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar $APP_OPTS\" ]"
+        "ENTRYPOINT [ \"sh\", \"-c\", \"java \$JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar \$APP_OPTS\" ]"
 //env
 
 //branch
@@ -52,16 +52,6 @@ pipeline{
     }
     stages{
 
-        stage('初始化'){
-            steps{
-                script{
-                    tools.PrintMes("初始化","green")
-                    pom = tools.ReadPomFile(pom_path)
-                    app_name = tools.GetPomArtifactId(pom)
-                    app_version = tools.GetPomVersion(pom)
-                }
-            }
-        }
         stage('CheckOut'){
             steps{
                 script{
@@ -72,6 +62,17 @@ pipeline{
                 }
             }
         }
+        stage('初始化'){
+            steps{
+                script{
+                    tools.PrintMes("初始化","green")
+                    pom = tools.ReadPomFile(pom_path)
+                    app_name = tools.GetPomArtifactId(pom)
+                    app_version = tools.GetPomVersion(pom)
+                }
+            }
+        }
+
         stage("Build"){
             steps{
                 script{

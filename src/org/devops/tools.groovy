@@ -106,7 +106,7 @@ def BuildWithContainer(buildType,buildShell){
 // 读取文本参数，将内容写到当前目录的文件中
 def WriteFile(fileParam,fileName){
     writeFile file: fileName, text: "${fileParam}"
-    println(fileParam)
+    sh "cat ${fileName}"
 }
 
 // 创建镜像tag
