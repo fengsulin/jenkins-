@@ -14,12 +14,19 @@ def buildShell = "mvn -U -B -e clean install -T 1C -Dmaven.test.skip=true --sett
 def git_url = "http://git.rdc.i139.cn/tssd-commons-services/netmonitor/cmdb-service"
 def runOpts
 def maven_settings_id = "76a57f8d-a5f1-4cc0-a235-b447bebefba9"
-def hub_credentialId = ""
+def hub_credentialId = "docker-hub-rdchub-username-password"
 def docker_hub = ""
 def app_name = ""
 def app_version = ""
 def docker_hub_type = "https"
 def docker_project = "net-monitor"
+def docker_dockerfile = "FROM hub.hwn.i139.cn/rdc-commons/official-openjdk:8u242-jre-sh\n" +
+        "VOLUME /tmp\n" +
+        "ADD target/*.jar app.jar\n" +
+        "RUN sh -c 'touch /app.jar'\n" +
+        "ENV JAVA_OPTS=\"-Xmx512M -Xms512M -Xss256k -XX:MaxRAMPercentage=80.0 -Duser.timezone=Asia/Shanghai\"\n" +
+        "ENV APP_OPTS=\"\"\n" +
+        "ENTRYPOINT [ \"sh\", \"-c\", \"java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar $APP_OPTS\" ]"
 //env
 
 //branch
@@ -74,9 +81,11 @@ pipeline{
             steps{
                 script{
                     tools.PrintMes("镜像构建","green")
+                    tools.WriteFile(docker_dockerfile,"Dockerfile")
                     tagName = tools.CreateImageTag(app_version,branch)
                     imageName = tools.CreateImageName(docker_hub,app_name,tagName,docker_project)
-                    tools.BuildImage(credentialId,docker_hub_type,docker_hub,imageName)
+                    tools.PrintMes("镜像名称：${imageName}","green")
+                    tools.BuildImage(hub_credentialId,docker_hub_type,docker_hub,imageName)
                 }
             }
         }
