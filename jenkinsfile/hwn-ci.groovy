@@ -14,6 +14,12 @@ def buildShell = "mvn -U -B -e clean install -T 1C -Dmaven.test.skip=true --sett
 def git_url = "http://git.rdc.i139.cn/tssd-commons-services/netmonitor/cmdb-service"
 def runOpts
 def maven_settings_id = "76a57f8d-a5f1-4cc0-a235-b447bebefba9"
+def hub_credentialId = ""
+def docker_hub = ""
+def app_name = ""
+def app_version = ""
+def docker_hub_type = "https"
+def docker_project = "net-monitor"
 //env
 
 //branch
@@ -61,6 +67,16 @@ pipeline{
                     tools.PrintMes("执行打包","green")
                     tools.WriteFileFromId(maven_settings_id,"settings.xml")
                     tools.BuildWithContainer(buildType,buildShell)
+                }
+            }
+        }
+        stage("Docker"){
+            steps{
+                script{
+                    tools.PrintMes("镜像构建","green")
+                    tagName = tools.CreateImageTag(app_version,branch)
+                    imageName = tools.CreateImageName(docker_hub,app_name,tagName,docker_project)
+                    tools.BuildImage(credentialId,docker_hub_type,docker_hub,imageName)
                 }
             }
         }

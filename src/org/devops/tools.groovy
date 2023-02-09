@@ -90,7 +90,7 @@ def Build(buildType,buildShell){
       export PATH=\$NODE_HOME/bin:\$PATH
     """
     }else{
-        sh "${buildHome}/bin/${buildType} ${buildShell}"
+        sh "${buildHome}/bin/${buildShell}"
     }
 }
 
@@ -109,15 +109,25 @@ def WriteFile(fileParam,fileName){
     println(fileParam)
 }
 
+// 创建镜像tag
+def CreateImageTag(app_version,branch){
+    tagName = "${app_version}${branch}"
+    return tagName
+}
+// 创建镜像名称
+def CreateImageName(docker_hub,app_name,tagName,docker_project){
+    imageName = "$docker_hub/$docker_project/${app_name}:${tagName}"
+    return imageName
+}
 // 构建镜像
-def BuildImage(credentialId,docker_hub,app_name,app_version,branch,docker_hub_type,docker_project){
+def BuildImage(credentialId,docker_hub_type,docker_hub,imageName){
     docker.withRegistry("$docker_hub_type://$docker_hub", "$credentialId") {
         println("构建镜像")
-        def customImage = docker.build("$docker_hub/$docker_project/${app_name}:${app_version}${branch}")
+        def customImage = docker.build(imageName)
         println("推送镜像")
         customImage.push()
         println("删除镜像")
-        sh "docker rmi $docker_hub/$docker_project/${app_name}:${app_version}${branch}"
+        sh "docker rmi ${imageName}"
     }
 }
 
