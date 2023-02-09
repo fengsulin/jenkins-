@@ -46,3 +46,10 @@ def GetDeployment(nameSpace,deployName){
     response = HttpReq('GET',apiUrl,'')
     return response
 }
+
+// 获取Deployment的运行状态
+def GetDeploymentStatus(nameSpace,deployName){
+    apiUrl = "namespaces/${nameSpace}/deployments/${deployName}/status"
+    response = HttpReq("GET",apiUrl,'')
+    return response
+}
