@@ -96,7 +96,7 @@ def Build(buildType,buildShell){
 
 // 基于docker容器提供构建环境
 def BuildWithContainer(buildType,buildShell){
-    def buildTools = ["mvn":"M2","ant":"ANT","gradle":"GRADLE","npm":"NPM"]
+    def buildTools = ["mvn":"maven-8","ant":"ANT","gradle":"GRADLE","npm":"NPM"]
     println("当前选择的构建类型为${buildType}")
     container(buildTools[buildType]){
         sh "${buildType} ${buildShell}"
@@ -188,4 +188,12 @@ def CheckOut(scm_type,url,credentialsId,branchName){
         println("git拉取代码")
         git branch: branchName ,changelog: true , credentialsId: credentialsId, url: url
     }
+}
+
+// 通过id读取文件并写入当前目录
+def WriteFileFromId(maven_settings_id,fileName){
+    configFileProvider([configFile(fileId: maven_settings_id, targetLocation: fileName)]) {
+        println("创建文件${fileName}")
+    }
+
 }

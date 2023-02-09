@@ -13,6 +13,7 @@ def buildType = "mvn"
 def buildShell = "mvn -U -B -e clean install -T 1C -Dmaven.test.skip=true --settings settings.xml"
 def git_url = "http://git.rdc.i139.cn/tssd-commons-services/netmonitor/cmdb-service"
 def runOpts
+def maven_settings_id = "76a57f8d-a5f1-4cc0-a235-b447bebefba9"
 //env
 
 //branch
@@ -50,7 +51,7 @@ pipeline{
                     println "${branch}"
 
                     tools.PrintMes("获取代码","green")
-                    tools.CheckOut(git_url,git_credentialsId,branch)
+                    tools.CheckOut("git",git_url,git_credentialsId,branch)
                 }
             }
         }
@@ -58,7 +59,8 @@ pipeline{
             steps{
                 script{
                     tools.PrintMes("执行打包","green")
-                    build.Build(buildType,buildShell)
+                    tools.WriteFileFromId(maven_settings_id,"settings.xml")
+                    build.BuildWithContainer(buildType,buildShell)
                 }
             }
         }
