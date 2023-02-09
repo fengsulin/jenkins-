@@ -99,7 +99,7 @@ def BuildWithContainer(buildType,buildShell){
     def buildTools = ["mvn":"maven-8","ant":"ANT","gradle":"GRADLE","npm":"NPM"]
     println("当前选择的构建类型为${buildType}")
     container(buildTools[buildType]){
-        sh "${buildType} ${buildShell}"
+        sh "${buildShell}"
     }
 }
 
